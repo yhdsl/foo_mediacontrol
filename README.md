@@ -18,11 +18,21 @@ Screenshot of foobar2000 in your Discord status using
 
 Building requires Windows 10 SDK version 10.0.10240.0 or higher.
 
- - Open the provided solution file (foobar2000/foo_mediacontrol/foo_mediacontrol.sln) in Visual Studio
- - Change the target to "Release" and platform to "x86"
- - Build the solution (Default: Ctrl+Shift+B)
- - Move the resulting foo_mediacontrol.dll to your foobar2000's components folder
- - (Re)Start foobar2000
+- Open the provided solution file in Visual Studio: `foobar2000/foo_mediacontrol/foo_mediacontrol.sln`
+- Change the target to `Release` and platform to `x86`
+- Build the solution
+- Move the resulting `foo_mediacontrol.dll` to your foobar2000's components folder
+- Restart foobar2000
+
+### Debugging
+
+- TODO Describe how to set the build directory to the foobar2000 component directory
+- TODO Describe how to launch foobar2000 instead of the built DLL
+
+### Updating the version
+
+- Open `foobar2000/foo_mediacontrol/main.cpp`
+- Change the version string to the new version
 
 ### Packaging
 
