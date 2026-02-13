@@ -38,6 +38,7 @@ void playback_listener::on_playback_new_track(metadb_handle_ptr p_track) {
 			.reset()
 			.set_title(data.get_title() != track_data::empty ? data.get_title() : data.get_file_name())
 			.set_artist(data.get_artist())
+			.set_album_artist(data.get_album_artist())
 			.set_genres(data.get_genres())
 			.set_album(data.get_album())
 			.set_track_number(data.get_track_number())
