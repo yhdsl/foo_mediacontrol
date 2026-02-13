@@ -9,7 +9,7 @@ out_ext=.fb2k-component
 all:
 
 package: $(dll_x86) $(dll_x64)
-	rmdir /S /Q package
+	if exist package rmdir /S /Q package
 	md package
 	md package\x86
 	md package\x64
