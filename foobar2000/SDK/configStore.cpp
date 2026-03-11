@@ -80,9 +80,7 @@ configEventHandle_t configEvent::operator+=(std::function< void() > f) const {
 
 void configEvent::operator-=(configEventHandle_t h) const {
 	auto obj = reinterpret_cast<configStoreNotifyImpl*>(h);
-    if ( core_api::are_services_available() ) {
-        static_api_ptr_t<configStore>()->removeNotify(m_name, obj);
-    }
+	static_api_ptr_t<configStore>()->removeNotify(m_name, obj);
 	delete obj;
 }
 
@@ -155,9 +153,7 @@ void appearanceChangeNotifyRef::set( std::function<void()> f ) {
 }
 void appearanceChangeNotifyRef::clear() {
     if (isSet()) {
-        if ( core_api::are_services_available() ) {
-            static_api_ptr_t<appearance>()->removeNotify2(handle);
-        }
+        static_api_ptr_t<appearance>()->removeNotify2(handle);
         handle = nullptr;
     }
 }

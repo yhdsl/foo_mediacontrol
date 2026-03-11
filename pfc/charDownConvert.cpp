@@ -115,10 +115,10 @@ namespace pfc {
             } else if (c == 0) {
                 break;
             } else {
-                unsigned wc; t_size d;
-                d = pfc::utf8_decode_char(src + walk, wc, len - walk);
+                unsigned c; t_size d;
+                d = pfc::utf8_decode_char(src + walk, c, len - walk);
                 if (d == 0) break;
-                TransformCharCachedAppend(wc, out);
+                TransformCharCachedAppend(c, out);
                 walk += d;
             }
         }

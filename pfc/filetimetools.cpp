@@ -28,28 +28,31 @@ namespace {
     } SYSTEMTIME, * PSYSTEMTIME, * LPSYSTEMTIME;
 
 }
-static struct tm SystemTimeToNix(const SYSTEMTIME& st) {
-    struct tm Time = {};
+static void SystemTimeToNix(const SYSTEMTIME& st, struct tm& Time) {
+    memset(&Time, 0, sizeof(Time));
     Time.tm_sec = st.wSecond;
     Time.tm_min = st.wMinute;
     Time.tm_hour = st.wHour;
     Time.tm_mday = st.wDay;
     Time.tm_mon = st.wMonth - 1;
     Time.tm_year = st.wYear - 1900;
-    return Time;
 }
 
 static t_filetimestamp ExportSystemTime(const SYSTEMTIME& st) {
-    auto Time = SystemTimeToNix(st);
-    return pfc::fileTimeUtoW(timegm(&Time));
+    struct tm Time;
+    SystemTimeToNix(st, Time);
+    return pfc::fileTimeUtoW(mktime(&Time));
 }
 
 static t_filetimestamp ExportSystemTimeLocal(const SYSTEMTIME& st) {
-    auto Time = SystemTimeToNix(st);
-    return pfc::fileTimeUtoW(mktime(&Time));
+    struct tm Time, Local;
+    SystemTimeToNix(st, Time);
+    time_t t = mktime(&Time);
+    localtime_r(&t, &Local);
+    return pfc::fileTimeUtoW(mktime(&Local));
 }
-static SYSTEMTIME SystemTimeFromNix(struct tm const& Time, t_filetimestamp origTS) {
-    SYSTEMTIME st = {};
+static void SystemTimeFromNix(SYSTEMTIME& st, struct tm const& Time, t_filetimestamp origTS) {
+    memset(&st, 0, sizeof(st));
     st.wSecond = Time.tm_sec;
     st.wMinute = Time.tm_min;
     st.wHour = Time.tm_hour;
@@ -58,14 +61,13 @@ static SYSTEMTIME SystemTimeFromNix(struct tm const& Time, t_filetimestamp origT
     st.wMonth = Time.tm_mon + 1;
     st.wYear = Time.tm_year + 1900;
     st.wMilliseconds = (origTS % filetimestamp_1second_increment) / (filetimestamp_1second_increment/1000);
-    return st;
 }
 
 static bool MakeSystemTime(SYSTEMTIME& st, t_filetimestamp ts) {
     time_t t = (time_t)pfc::fileTimeWtoU(ts);
     struct tm Time;
     if (gmtime_r(&t, &Time) == NULL) return false;
-    st = SystemTimeFromNix(Time, ts);
+    SystemTimeFromNix(st, Time, ts);
     return true;
 }
 
@@ -73,7 +75,7 @@ static bool MakeSystemTimeLocal(SYSTEMTIME& st, t_filetimestamp ts) {
     time_t t = (time_t)pfc::fileTimeWtoU(ts);
     struct tm Time;
     if (localtime_r(&t, &Time) == NULL) return false;
-    st = SystemTimeFromNix(Time, ts);
+    SystemTimeFromNix(st, Time, ts);
     return true;
 }
 
@@ -246,7 +248,7 @@ namespace {
         unsigned Y, M, D;
         unsigned h, m, s;
         double sfrac;
-        int tzdelta; // timezone shift in minutes
+        int tzdelta;
     };
 
     dateISO_t read_ISO_8601(const char* dateISO) {
@@ -307,12 +309,13 @@ t_filetimestamp pfc::filetimestamp_from_string_ISO_8601(const char* dateISO) {
         auto elems = read_ISO_8601(dateISO);
 
         SYSTEMTIME st = {};
-        st.wYear = (WORD)elems.Y;
-        st.wMonth = (WORD)elems.M;
-        st.wDay = (WORD)elems.D;
-        st.wHour = (WORD)elems.h;
-        st.wMinute = (WORD)elems.m;
-        st.wSecond = (WORD)elems.s;
+        st.wDay = 1; st.wMonth = 1;
+        st.wYear = elems.Y;
+        st.wMonth = elems.M;
+        st.wDay = elems.D;
+        st.wHour = elems.h;
+        st.wMinute = elems.m;
+        st.wSecond = elems.s;
         st.wMilliseconds = (WORD)floor(elems.sfrac * 1000.f);
 
         if (!st_sanity(st)) throw exception_time_error();

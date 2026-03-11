@@ -2,16 +2,16 @@
 
 @implementation NSEvent (ppstuff)
 
-- (BOOL)pp_isKeyDown {
+- (BOOL)isKeyDown {
     return self.type == NSEventTypeKeyDown;
 }
-- (BOOL)pp_isCmdKeyDown {
-    return self.pp_isKeyDown && self.pp_modifierFlagsDI == NSEventModifierFlagCommand;
+- (BOOL)isCmdKeyDown {
+    return self.isKeyDown && self.modifierFlagsDI == NSEventModifierFlagCommand;
 }
-- (BOOL)pp_isShiftKeyDown {
-    return self.pp_isKeyDown && self.pp_modifierFlagsDI == NSEventModifierFlagShift;
+- (BOOL)isShiftKeyDown {
+    return self.isKeyDown && self.modifierFlagsDI == NSEventModifierFlagShift;
 }
-- (NSEventModifierFlags)pp_modifierFlagsDI {
+- (NSEventModifierFlags)modifierFlagsDI {
     return self.modifierFlags & NSEventModifierFlagDeviceIndependentFlagsMask;
 }
 @end

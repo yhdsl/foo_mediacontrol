@@ -8,12 +8,6 @@
 #define PrepLayoutCache_Debug 0
 #define Scroll_Debug 0
 
-#if Scroll_Debug
-#define Scroll_Debug_Print(...) PFC_DEBUG_PRINT_FORCED(__VA_ARGS__)
-#else
-#define Scroll_Debug_Print(...)
-#endif
-
 CListControlUserOptions * CListControlUserOptions::instance = nullptr;
 
 CRect CListControlImpl::GetClientRectHook() const {
@@ -107,7 +101,9 @@ void CListControlImpl::RefreshSlider(bool p_vertical) {
 		}	
 	}
 
-	Scroll_Debug_Print("RefreshSlider vertical=", p_vertical, ", nPage=", si.nPage, ", nMin=", si.nMin, ", nMax=", si.nMax, ", nPos=", si.nPos);
+#if Scroll_Debug
+	pfc::debugLog() << "RefreshSlider vertical=" << p_vertical << ", nPage=" << si.nPage << ", nMin=" << si.nMin << ", nMax=" << si.nMax << ", nPos=" << si.nPos;
+#endif
 
 	SetScrollInfo(p_vertical ? SB_VERT : SB_HORZ, &si);
 }
@@ -303,8 +299,9 @@ LRESULT CListControlImpl::OnVScroll(UINT,WPARAM p_wp,LPARAM,BOOL&) {
 	thumb = pfc::rint32(p * bottom);
 	int target = HandleScroll(LOWORD(p_wp), m_viewOrigin.y, visible, GetItemHeight(), bottom, thumb);
 
-	Scroll_Debug_Print("OnVScroll thumb=", thumb, ", target=", target, ", bottom=", bottom, ", visible=", visible, ", p=", p);
-
+#if Scroll_Debug
+	pfc::debugLog() << "OnVScroll thumb=" << thumb << ", target=" << target << ", bottom=" << bottom << ", visible=" << visible << ", p=" << p;
+#endif
 	MoveViewOrigin(CPoint(m_viewOrigin.x, target));
 
 	return 0;
@@ -316,13 +313,8 @@ LRESULT CListControlImpl::OnVScroll(UINT,WPARAM p_wp,LPARAM,BOOL&) {
 // As a workaround, we use GetScrollInfo() value for vscroll (good)
 // and workaround Logitech bug by using WPARAM position with hscroll (practically impossible to overflow)
 LRESULT CListControlImpl::OnHScroll(UINT,WPARAM p_wp,LPARAM,BOOL&) {
-	int thumb = HIWORD(p_wp);
-	const auto fullWidth = GetViewAreaWidth();
-	if (fullWidth > INT16_MAX) { // Possible overflow or near-overflow? Drop Logitech stupidity mitigation
-		thumb = GetScrollThumbPos(SB_HORZ);
-	}
-	int target = HandleScroll(LOWORD(p_wp), m_viewOrigin.x, GetVisibleRectAbs().Width(), GetItemHeight() /*fixme*/, fullWidth, thumb);
-	Scroll_Debug_Print("OnHScroll thumb=", thumb, ", target=", target);
+	int thumb = HIWORD(p_wp); // GetScrollThumbPos(SB_HORZ);
+	int target = HandleScroll(LOWORD(p_wp),m_viewOrigin.x,GetVisibleRectAbs().Width(),GetItemHeight() /*fixme*/,GetViewAreaRectAbs().right,thumb);
 	MoveViewOrigin(CPoint(target,m_viewOrigin.y));
 	return 0;
 }
@@ -742,7 +734,9 @@ bool CListControlImpl::PrepLayoutCache(CPoint& ptOrigin, size_t indexLo, size_t 
 
 int CListControlImpl::GetViewAreaHeight() const {
 	auto ret = GetItemOffsetAbs(GetItemCount());
-	Scroll_Debug_Print("GetViewAreaHeight: " , ret);
+#if Scroll_Debug
+	PFC_DEBUGLOG << "GetViewAreaHeight: " << ret;
+#endif
 	return ret;
 }
 
@@ -837,7 +831,7 @@ static void AddUpdateRect(HRGN p_rgn,CRect const & p_rect) {
 }
 
 void CListControlImpl::OnItemsReordered( const size_t * order, size_t count ) {
-	PFC_ASSERT(count == GetItemCount()); (void)count;
+	PFC_ASSERT( count == GetItemCount() );
 	ReloadItems( pfc::bit_array_order_changed(order) );
 }
 void CListControlImpl::UpdateItems(const pfc::bit_array & p_mask) {
@@ -851,7 +845,7 @@ void CListControlImpl::UpdateItems(const pfc::bit_array & p_mask) {
 			AddUpdateRect(updateRgn,GetItemRect(walk));
 		}
 		if (found) {
-			InvalidateRgn(updateRgn, FALSE /*NO erasebackground*/);
+			InvalidateRgn(updateRgn);
 		}
 	}
 }
@@ -894,7 +888,7 @@ void CListControlImpl::UpdateItemsAndHeaders(const pfc::bit_array & p_mask) {
 			AddUpdateRect(updateRgn,GetItemRect(walk));
 		}
 		if (found) {
-			InvalidateRgn(updateRgn, FALSE /*NO erasebackground*/);
+			InvalidateRgn(updateRgn);
 		}
 	}
 }

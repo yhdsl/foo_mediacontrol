@@ -30,10 +30,7 @@ bool uGetClipboardString(pfc::string_base & out) {
     return rv;
 }
 
-static void wrapNoExcept(std::function<void()> f) noexcept {f();}
-
 void fb2k::crashOnException(std::function<void()> f, const char * context) {
-#if 0
     auto fail = [context] ( const char * msg ) {
         if (context) {
             fb2k::crashWithMessage(pfc::format(context, ": ", msg));
@@ -60,7 +57,4 @@ void fb2k::crashOnException(std::function<void()> f, const char * context) {
     } catch(...) {
         fail("Invalid exception");
     }
-#else
-    wrapNoExcept(f);
-#endif
 }

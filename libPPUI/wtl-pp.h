@@ -4,7 +4,7 @@
 #include <Uxtheme.h>
 #include <functional>
 
-#define ATLASSERT_SUCCESS(X) {auto RetVal = (X); ATLASSERT( RetVal ); (void) RetVal; }
+#define ATLASSERT_SUCCESS(X) {auto RetVal = (X); ATLASSERT( RetVal ); }
 
 #ifdef SubclassWindow // mitigate windowsx.h clash
 #undef SubclassWindow

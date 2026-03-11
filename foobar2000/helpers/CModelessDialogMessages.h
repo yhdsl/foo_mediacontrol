@@ -3,7 +3,7 @@
 
 class CModelessDialogMessages {
 public:
-	static BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM, LPARAM, LRESULT&) {
+	static BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult) {
 		switch (uMsg) {
 		case WM_INITDIALOG:
 			modeless_dialog_manager::g_add(hWnd); break;
