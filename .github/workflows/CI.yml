@@ -37,11 +37,8 @@ jobs:
           New-Item -ItemType Directory -Force build\x64
           New-Item -ItemType Directory -Force build\x86
 
-          $x64 = Get-ChildItem -Recurse -Filter foo_mediacontrol.dll | Where-Object {$_.FullName -match "x64"} | Select-Object -First 1
-          $x86 = Get-ChildItem -Recurse -Filter foo_mediacontrol.dll | Where-Object {$_.FullName -match "x86"} | Select-Object -First 1
-
-          Copy-Item $x64.FullName build\x64\
-          Copy-Item $x86.FullName build\x86\
+          Copy-Item foobar2000\foo_mediacontrol\x64\Release\foo_mediacontrol.dll build\x64\
+          Copy-Item foobar2000\foo_mediacontrol\Release\foo_mediacontrol.dll build\x86\
 
           Compress-Archive -Path build\x64\* -DestinationPath foo_mediacontrol-x64.zip -Force
           Compress-Archive -Path build\x86\* -DestinationPath foo_mediacontrol-x86.zip -Force
