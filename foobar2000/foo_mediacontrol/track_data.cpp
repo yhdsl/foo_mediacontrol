@@ -31,7 +31,7 @@ track_data::track_data(metadb_handle_ptr metadb_data) {
 					);
 
 					if (i > 0)
-						combined += L"&";
+						combined += L", ";
 
 					combined += value;
 					delete[] value;
