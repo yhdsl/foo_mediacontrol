@@ -19,8 +19,28 @@ track_data::track_data(metadb_handle_ptr metadb_data) {
 
 		// populate basic info map
 		for (track_data_map::iterator it = m_data.begin(); it != m_data.end(); ++it) {
-			if (info.meta_exists(it->first)) {
-				it->second = util::utf8_to_wide(info.meta_get(it->first, 0));
+			t_size meta_index = info.meta_find(it->first);
+
+			if (meta_index != pfc_infinite) {
+				t_size count = info.meta_enum_value_count(meta_index);
+				std::wstring combined;
+
+				for (t_size i = 0; i < count; ++i) {
+					wchar_t* value = util::utf8_to_wide(
+						info.meta_enum_value(meta_index, i)
+					);
+
+					if (i > 0)
+						combined += L"&";
+
+					combined += value;
+					delete[] value;
+				}
+
+				wchar_t* result = new wchar_t[combined.size() + 1];
+				wcscpy(result, combined.c_str());
+
+				it->second = result;
 			}
 		}
 		
