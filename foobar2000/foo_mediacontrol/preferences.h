@@ -2,7 +2,7 @@
 
 #include "resource.h"
 
-#define PREFERENCES_SECTION_NAME "Windows 10 Media Controls"
+#define PREFERENCES_SECTION_NAME "Windows 10 媒体控制支持"
 
 class preferences : public CDialogImpl<preferences>, public preferences_page_instance {
 public:

@@ -1,4 +1,4 @@
 #include "stdafx.h"
 
-DECLARE_COMPONENT_VERSION("Windows 10 Media Controls","1.4","Adds the ability for foobar2000 to interact with the Windows 10 media control overlay.");
+DECLARE_COMPONENT_VERSION("Windows 10 媒体控制支持","1.4","为 foobar2000 添加 Windows 10 媒体控制功能支持。");
 VALIDATE_COMPONENT_FILENAME("foo_mediacontrol.dll");
