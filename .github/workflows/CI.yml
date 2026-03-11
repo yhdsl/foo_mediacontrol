@@ -47,7 +47,7 @@ jobs:
           Rename-Item foo_mediacontrol-x86.zip foo_mediacontrol-x86.fb2k-component
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: foo_mediacontrol-components
           path: |
