@@ -1,0 +1,58 @@
+name: Build foo_mediacontrol
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build x64
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
+          msbuild foobar2000\foo_mediacontrol\foo_mediacontrol.sln ^
+            /p:Configuration=Release ^
+            /p:Platform=x64 ^
+            /m
+
+      - name: Build x86
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
+          msbuild foobar2000\foo_mediacontrol\foo_mediacontrol.sln ^
+            /p:Configuration=Release ^
+            /p:Platform=x86 ^
+            /m
+
+      - name: Package fb2k components
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force build\x64
+          New-Item -ItemType Directory -Force build\x86
+
+          $x64 = Get-ChildItem -Recurse -Filter foo_mediacontrol.dll | Where-Object {$_.FullName -match "x64"} | Select-Object -First 1
+          $x86 = Get-ChildItem -Recurse -Filter foo_mediacontrol.dll | Where-Object {$_.FullName -match "x86"} | Select-Object -First 1
+
+          Copy-Item $x64.FullName build\x64\
+          Copy-Item $x86.FullName build\x86\
+
+          Compress-Archive -Path build\x64\* -DestinationPath foo_mediacontrol-x64.zip -Force
+          Compress-Archive -Path build\x86\* -DestinationPath foo_mediacontrol-x86.zip -Force
+
+          Rename-Item foo_mediacontrol-x64.zip foo_mediacontrol-x64.fb2k-component
+          Rename-Item foo_mediacontrol-x86.zip foo_mediacontrol-x86.fb2k-component
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: foo_mediacontrol-components
+          path: |
+            foo_mediacontrol-x64.fb2k-component
+            foo_mediacontrol-x86.fb2k-component
